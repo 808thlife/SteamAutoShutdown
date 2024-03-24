@@ -1,4 +1,5 @@
 import customtkinter
+import webbrowser
 from PIL import Image
 import time
 from main import get_network_stats, check_connection
@@ -34,6 +35,9 @@ customtkinter.set_appearance_mode("dark-blue")
 app = customtkinter.CTk()
 
 app.geometry("700x500")
+
+def callback(url):
+    webbrowser.open_new(url)
 
 def schedule_check_connection():
     global internet_status, is_on
@@ -116,6 +120,14 @@ optionmenu = customtkinter.CTkOptionMenu(app, values=["Turn Off The Computer", "
                                          command=optionmenu_callback)
 optionmenu.pack(pady=50)
 
+#hyperlink to repo
+#link1 is github repo
+link1 = customtkinter.CTkLabel(app, text="GitHub Repo", cursor = "heart")
+link1.pack(pady=(50,0))
+link1.bind("<Button-1>", lambda e: callback("https://github.com/808thlife/SteamAutoShutdown"))
+
+
+#timer label before some_event happens
 timer_label = customtkinter.CTkLabel(app, text=f"Time Remaining: {initial_time} seconds", font=("Arial", 20))
 
 # updates speed label every x time. in this case 1 second (1000ms)
