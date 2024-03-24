@@ -39,7 +39,6 @@ def schedule_check_connection():
     global internet_status, is_on
 
     internet_status = check_connection()
-    print(internet_status)
 
     if internet_status:
         is_on = True
