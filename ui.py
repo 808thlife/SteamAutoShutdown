@@ -33,7 +33,7 @@ customtkinter.set_appearance_mode("dark")
 customtkinter.set_appearance_mode("dark-blue")
 
 app = customtkinter.CTk()
-
+app.title("Steam Auto ShutDown")
 app.geometry("700x500")
 
 def callback(url):
