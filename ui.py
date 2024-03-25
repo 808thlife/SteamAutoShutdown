@@ -23,7 +23,7 @@ download_speed = get_network_stats()
 
 #initial starting point for timer to count down from (in seconds)
 global initial_time
-initial_time = 60
+initial_time = 5
 
 #whether the machine turns off or just goes to sleep
 global user_option
@@ -45,14 +45,14 @@ def schedule_check_connection():
 
     while True:
         internet_status = check_connection()
-        print("internet status is " + str(internet_status))
+       
         if internet_status:
             is_on = True
             internet_connection_warning.pack_forget()
         else:
             is_on = False
             internet_connection_warning.pack(pady=10)
-        print(is_on)
+
         time.sleep(5)  # Check every 5 seconds
 
 def update_speed_label():
@@ -93,11 +93,12 @@ def timer():
         elif initial_time == 0 and download_speed < 100 and is_on and internet_status:
             if user_option == "Go To Sleep":
                 computer_sleep()
+                app.destroy()
             else:
                 shutdown_machine(platform)
         else:
             #resetings timer in order to use it later
-            initial_time = 60
+            initial_time = 5
             timer_label.pack_forget()
 
         time.sleep(1)
