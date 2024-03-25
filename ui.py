@@ -22,8 +22,10 @@ global download_speed
 download_speed = get_network_stats() 
 
 #initial starting point for timer to count down from (in seconds)
+global INITIAL_TIME
+INITIAL_TIME = 60
 global initial_time
-initial_time = 5
+initial_time = INITIAL_TIME
 
 #whether the machine turns off or just goes to sleep
 global user_option
@@ -86,11 +88,11 @@ def timer():
     global initial_time, user_option, download_speed
 
     while True:
-        if initial_time > 0 and download_speed < 100 and is_on and internet_status:
+        if initial_time > 0 and download_speed < 200 and is_on and internet_status:
             timer_label.pack(pady = 50)
             initial_time -=1
             timer_label.configure(text = f"{user_option} in {initial_time} seconds", font=("Arial", 20))
-        elif initial_time == 0 and download_speed < 100 and is_on and internet_status:
+        elif initial_time == 0 and download_speed < 200 and is_on and internet_status:
             if user_option == "Go To Sleep":
                 computer_sleep()
                 app.destroy()
@@ -98,7 +100,7 @@ def timer():
                 shutdown_machine(platform)
         else:
             #resetings timer in order to use it later
-            initial_time = 5
+            initial_time = INITIAL_TIME
             timer_label.pack_forget()
 
         time.sleep(1)
