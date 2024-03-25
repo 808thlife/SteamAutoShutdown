@@ -6,6 +6,7 @@ from main import get_network_stats, check_connection
 from commands.bedtime import computer_sleep
 from commands.shutdown import shutdown_machine
 from sys import platform
+import threading
 
 #check connection status
 global internet_status
@@ -42,24 +43,25 @@ def callback(url):
 def schedule_check_connection():
     global internet_status, is_on
 
-    internet_status = check_connection()
-
-    if internet_status:
-        is_on = True
-        internet_connection_warning.pack_forget()
-    else:
-        is_on = False
-        internet_connection_warning.pack(pady=10)
-    print(is_on)
-    app.after(5000, schedule_check_connection)
+    while True:
+        internet_status = check_connection()
+        print("internet status is " + str(internet_status))
+        if internet_status:
+            is_on = True
+            internet_connection_warning.pack_forget()
+        else:
+            is_on = False
+            internet_connection_warning.pack(pady=10)
+        print(is_on)
+        time.sleep(5)  # Check every 5 seconds
 
 def update_speed_label():
     global download_speed
 
-    download_speed = get_network_stats()
-    speed_label.configure(text = f"Current Download Speed: {download_speed}KB/S")
-
-    app.after(1000, update_speed_label)
+    while True:
+        download_speed = get_network_stats()
+        speed_label.configure(text=f"Current Download Speed: {download_speed}KB/S")
+        time.sleep(1)  # Update every 1 second
 
 #gives user an option what to do when download finished
 def optionmenu_callback(choice):
@@ -83,21 +85,23 @@ def switch_event():
 def timer():
     global initial_time, user_option, download_speed
 
-    if initial_time > 0 and download_speed < 10 and is_on and internet_status:
-        timer_label.pack(pady = 50)
-        initial_time -=1
-        timer_label.configure(text = f"{user_option} in {initial_time} seconds", font=("Arial", 20))
-    elif initial_time == 0 and download_speed < 10 and is_on and internet_status:
-        if user_option == "Go To Sleep":
-            computer_sleep()
+    while True:
+        if initial_time > 0 and download_speed < 100 and is_on and internet_status:
+            timer_label.pack(pady = 50)
+            initial_time -=1
+            timer_label.configure(text = f"{user_option} in {initial_time} seconds", font=("Arial", 20))
+        elif initial_time == 0 and download_speed < 100 and is_on and internet_status:
+            if user_option == "Go To Sleep":
+                computer_sleep()
+            else:
+                shutdown_machine(platform)
         else:
-            shutdown_machine(platform)
-    else:
-        #resetings timer in order to use it later
-        initial_time = 60
-        timer_label.pack_forget()
+            #resetings timer in order to use it later
+            initial_time = 60
+            timer_label.pack_forget()
 
-    app.after(1000,timer)
+        time.sleep(1)
+    #app.after(2000,timer)
 
 #internet connection warning
 internet_connection_warning = customtkinter.CTkLabel(app, text = "CHECK INTERNET CONNECTION", text_color = "red")
@@ -130,13 +134,14 @@ link1.bind("<Button-1>", lambda e: callback("https://github.com/808thlife/SteamA
 #timer label before some_event happens
 timer_label = customtkinter.CTkLabel(app, text=f"Time Remaining: {initial_time} seconds", font=("Arial", 20))
 
-# updates speed label every x time. in this case 1 second (1000ms)
-update_speed_label()
+# Create threads for background tasks
+check_connection_thread = threading.Thread(target=schedule_check_connection)
+update_speed_thread = threading.Thread(target=update_speed_label)
+timer_thread = threading.Thread(target=timer)
 
-#timer
-timer()
-
-#calling function that checks if user has internet connection
-schedule_check_connection()
+# Start the threads
+check_connection_thread.start()
+update_speed_thread.start()
+timer_thread.start()
 
 app.mainloop()
