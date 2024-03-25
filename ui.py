@@ -8,6 +8,10 @@ from commands.shutdown import shutdown_machine
 from sys import platform
 import threading
 
+#internet speed var (if your current speed is less than this value then application will start the countdown)
+global INTERNET_SPEED
+INTERNET_SPEED = 200 #200kb/s
+
 #check connection status
 global internet_status
 internet_status = check_connection()
@@ -88,11 +92,11 @@ def timer():
     global initial_time, user_option, download_speed
 
     while True:
-        if initial_time > 0 and download_speed < 200 and is_on and internet_status:
+        if initial_time > 0 and download_speed < INTERNET_SPEED and is_on and internet_status:
             timer_label.pack(pady = 50)
             initial_time -=1
             timer_label.configure(text = f"{user_option} in {initial_time} seconds", font=("Arial", 20))
-        elif initial_time == 0 and download_speed < 200 and is_on and internet_status:
+        elif initial_time == 0 and download_speed < INTERNET_SPEED and is_on and internet_status:
             if user_option == "Go To Sleep":
                 computer_sleep()
                 app.destroy()
